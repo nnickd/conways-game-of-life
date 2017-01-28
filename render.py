@@ -7,12 +7,13 @@ import time
 
 
 class render(object):
-    x = 100
-    y = 100
+    pause = False
+    x = 1000
+    y = 1000
     window = pyglet.window.Window(x, y)
     # window = pyglet.window.Window(fullscreen=True)
     vertex_list = None
-    grid = grid(screen_x=x, screen_y=y, x=50, y=50, on=0.5, off=0.5, scale=2, margin=0)
+    grid = grid(screen_x=x, screen_y=y, x=100, y=100, on=0.5, off=0.5, scale=2, margin=0)
 
     i = 0
     t = time.time()
@@ -27,7 +28,7 @@ class render(object):
     def update(self, dt):
         # t = time.time()
 
-        render.grid.update()
+        render.grid.update(render.pause)
         render.vertex_list = pyglet.graphics.vertex_list(len(render.grid.on_list) // 2, 'v2f/stream', 'c3B/static')
         render.vertex_list.vertices = render.grid.on_list
         render.vertex_list.colors = np.array([(0, 255, int(random() * 255)) for i in range(len(render.grid.on_list) // 2)]).flatten()
@@ -53,13 +54,23 @@ class render(object):
             print(render.i, time.time() - render.m)
             print(time.time() - render.t)
             pyglet.app.exit()
+        if symbol == key.RIGHT:
+            render.grid.scale += 1
+        if symbol == key.LEFT:
+            render.grid.scale -= 1
+        if symbol == key.UP:
+            render.pause = not render.pause
 
     @window.event
     def on_mouse_press(x, y, button, modifiers):
         if button == mouse.LEFT:
             j = (x + (render.grid.x * render.grid.scale // 2) - (render.x / 2)) // render.grid.scale + 1
             i = (y + (render.grid.y * render.grid.scale // 2) - (render.y / 2)) // render.grid.scale + 1
-            render.grid.turn_on(i, j)
+            # render.grid.turn_on(i, j)
+            if render.grid.on_at(i, j):
+                render.grid.turn_off(i, j)
+            else:
+                render.grid.turn_on(i, j)
 
         if button == mouse.RIGHT:
             pass
