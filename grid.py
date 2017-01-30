@@ -3,14 +3,22 @@ import numpy as np
 
 class grid(object):
 
-    def __init__(self, screen_x, screen_y, x, y, on=0.1, off=0.9, scale=2, margin=2):
-        self.screen_x = screen_x
-        self.screen_y = screen_y
+    def __init__(self, x, y, on=0.1, off=0.9, scale=2, margin=2):
         self.x = x
         self.y = y
         self.scale = scale
         self.margin = margin
         self.random_grid(on, off)
+        self.screen_x = self.scaled_x
+        self.screen_y = self.scaled_y
+
+    @property
+    def scaled_x(self):
+        return self.x * self.scale
+
+    @property
+    def scaled_y(self):
+        return self.y * self.scale
 
     def random_grid(self, on, off):
         self.grid = np.random.choice([0, 255], self.x * self.y, p=[off, on]).reshape(self.y, self.x)
@@ -32,17 +40,17 @@ class grid(object):
 
     def render_this(self, i, j):
         if True if self.grid[i, j] == 255 else False:
-            self.on_list.append((j * self.scale) + (self.screen_x / 2) - (self.x * self.scale / 2))
-            self.on_list.append((i * self.scale) + (self.screen_y / 2) - (self.y * self.scale / 2))
+            self.on_list.append((j * self.scale) + (self.screen_x / 2) - (self.scaled_x / 2))
+            self.on_list.append((i * self.scale) + (self.screen_y / 2) - (self.scaled_y / 2))
 
-            self.on_list.append((j * self.scale) + (self.screen_x / 2) - (self.x * self.scale / 2) + self.margin - self.scale)
-            self.on_list.append((i * self.scale) + (self.screen_y / 2) - (self.y * self.scale / 2))
+            self.on_list.append((j * self.scale) + (self.screen_x / 2) - (self.scaled_x / 2) + self.margin - self.scale)
+            self.on_list.append((i * self.scale) + (self.screen_y / 2) - (self.scaled_y / 2))
 
-            self.on_list.append((j * self.scale) + (self.screen_x / 2) - (self.x * self.scale / 2) + self.margin - self.scale)
-            self.on_list.append((i * self.scale) + (self.screen_y / 2) - (self.y * self.scale / 2) + self.margin - self.scale)
+            self.on_list.append((j * self.scale) + (self.screen_x / 2) - (self.scaled_x / 2) + self.margin - self.scale)
+            self.on_list.append((i * self.scale) + (self.screen_y / 2) - (self.scaled_y / 2) + self.margin - self.scale)
 
-            self.on_list.append((j * self.scale) + (self.screen_x / 2) - (self.x * self.scale / 2))
-            self.on_list.append((i * self.scale) + (self.screen_y / 2) - (self.y * self.scale / 2) + self.margin - self.scale)
+            self.on_list.append((j * self.scale) + (self.screen_x / 2) - (self.scaled_x / 2))
+            self.on_list.append((i * self.scale) + (self.screen_y / 2) - (self.scaled_y / 2) + self.margin - self.scale)
 
     def apply_rules(self, i, j):
         self.render_this(i, j)
@@ -73,3 +81,8 @@ class grid(object):
 
     def on_at(self, i, j):
         return True if self.grid[i, j] == 255 else False
+
+    def clear(self):
+        for i in range(self.y):
+            for j in range(self.x):
+                self.turn_off(i, j)

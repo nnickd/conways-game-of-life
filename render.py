@@ -8,12 +8,11 @@ import time
 
 class render(object):
     pause = False
-    x = 1000
-    y = 1000
-    window = pyglet.window.Window(x, y)
-    # window = pyglet.window.Window(fullscreen=True)
     vertex_list = None
-    grid = grid(screen_x=x, screen_y=y, x=100, y=100, on=0.5, off=0.5, scale=2, margin=0)
+    grid = grid(x=30, y=30, on=0.5, off=0.5, scale=30, margin=1)
+    window = pyglet.window.Window(grid.scaled_x, grid.scaled_y, resizable=True)
+    screen_x = grid.scaled_x
+    screen_y = grid.scaled_y
 
     i = 0
     t = time.time()
@@ -40,6 +39,12 @@ class render(object):
         render.i += 1
 
     @window.event
+    def on_resize(width, height):
+        render.grid.screen_x = width
+        render.grid.screen_y = height
+        pass
+
+    @window.event
     def on_draw():
         render.window.clear()
         render.vertex_list.draw(pyglet.gl.GL_QUADS)
@@ -56,16 +61,18 @@ class render(object):
             pyglet.app.exit()
         if symbol == key.RIGHT:
             render.grid.scale += 1
+            render.window.set_size(render.grid.scaled_x, render.grid.scaled_y)
         if symbol == key.LEFT:
             render.grid.scale -= 1
+            render.window.set_size(render.grid.scaled_x, render.grid.scaled_y)
         if symbol == key.UP:
             render.pause = not render.pause
 
     @window.event
     def on_mouse_press(x, y, button, modifiers):
         if button == mouse.LEFT:
-            j = (x + (render.grid.x * render.grid.scale // 2) - (render.x / 2)) // render.grid.scale + 1
-            i = (y + (render.grid.y * render.grid.scale // 2) - (render.y / 2)) // render.grid.scale + 1
+            j = (x + (render.grid.scaled_x // 2) - (render.grid.screen_x // 2)) // render.grid.scale + 1
+            i = (y + (render.grid.scaled_y // 2) - (render.grid.screen_y // 2)) // render.grid.scale + 1
             # render.grid.turn_on(i, j)
             if render.grid.on_at(i, j):
                 render.grid.turn_off(i, j)
@@ -73,7 +80,8 @@ class render(object):
                 render.grid.turn_on(i, j)
 
         if button == mouse.RIGHT:
-            pass
+            render.grid.clear()
+            render.pause = True
 
 
 r = render()
