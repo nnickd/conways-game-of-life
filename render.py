@@ -69,11 +69,17 @@ class render(object):
             render.pause = not render.pause
 
     @window.event
+    def on_mouse_drag(x, y, dx, dy, buttons, modifiers):
+        if buttons & mouse.LEFT:
+            j = (x + (render.grid.scaled_x // 2) - (render.grid.screen_x // 2)) // render.grid.scale + 1
+            i = (y + (render.grid.scaled_y // 2) - (render.grid.screen_y // 2)) // render.grid.scale + 1
+            render.grid.turn_on(i, j)
+
+    @window.event
     def on_mouse_press(x, y, button, modifiers):
         if button == mouse.LEFT:
             j = (x + (render.grid.scaled_x // 2) - (render.grid.screen_x // 2)) // render.grid.scale + 1
             i = (y + (render.grid.scaled_y // 2) - (render.grid.screen_y // 2)) // render.grid.scale + 1
-            # render.grid.turn_on(i, j)
             if render.grid.on_at(i, j):
                 render.grid.turn_off(i, j)
             else:
